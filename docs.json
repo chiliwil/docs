@@ -51,6 +51,55 @@
               "api-reference/endpoint/delete",
               "api-reference/endpoint/webhook"
             ]
+          },
+          {
+            "group": "Invoice Sale",
+            "pages": [
+              "api-reference/endpoint/invoice-sale/invoice-sale",
+              "api-reference/endpoint/invoice-sale/invoice-sale-anulation"
+            ]
+          },
+          {
+            "group": "Invoice Sale Bonuses",
+            "pages": [
+              "api-reference/endpoint/invoice-sale-bon/invoice-sale-bon",
+              "api-reference/endpoint/invoice-sale-bon/invoice-sale-bon-anulation"
+            ]
+          },
+          {
+            "group": "Note Debit",
+            "pages": [
+              "api-reference/endpoint/note-debit/note-debit",
+              "api-reference/endpoint/note-debit/note-debit-anulation"
+            ]
+          },
+          {
+            "group": "Invoice Rate",
+            "pages": [
+              "api-reference/endpoint/invoice-rate/invoice-rate",
+              "api-reference/endpoint/invoice-rate/invoice-rate-anulation"
+            ]
+          },
+          {
+            "group": "Invoice Export Services",
+            "pages": [
+              "api-reference/endpoint/invoice-export/invoice-export",
+              "api-reference/endpoint/invoice-export/invoice-export-anulation"
+            ]
+          },
+          {
+            "group": "Invoice Hospital",
+            "pages": [
+              "api-reference/endpoint/invoice-hospital/invoice-hospital",
+              "api-reference/endpoint/invoice-hospital/invoice-hospital-anulation"
+            ]
+          },
+          {
+            "group": "Invoice Free Zone",
+            "pages": [
+              "api-reference/endpoint/invoice-free-zone/invoice-free-zone",
+              "api-reference/endpoint/invoice-free-zone/invoice-free-zone-anulation"
+            ]
           }
         ]
       }

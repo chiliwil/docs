@@ -1,16 +1,13 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "API Facturación Electrónica",
+    "description": "API para generación de facturas electrónicas con validación ante el SIN",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://sandbox.cucu.bo/api/v1"
     }
   ],
   "security": [
@@ -19,72 +16,97 @@
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/invoice/electronic/sale": {
+      "post": {
+        "summary": "Genera una factura electrónica de venta",
+        "description": "Endpoint para la emisión de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequest"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "CLIENTE TEST",
+                "clientDocumentType": 1,
+                "clientNroDocument": 123456789,
+                "clientCode": "CLIENTE2-TEST",
+                "paramPaymentMethod": 1,
+                "userPos": "S4INC12ABCX",
+                "typeInvoice": 1,
+                "paramCurrency": 1,
+                "clientComplement": 1,
+                "clientCity": "Santa Cruz",
+                "clientEmail": "cliente@gmail.com",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 11,
+                    "codeProductSin": 83141,
+                    "codeProduct": "CC-SRVSISCLOUD123",
+                    "description": "IMPLEMENTACIÓN DE SISTEMAS EN LA NUBE",
+                    "qty": 2,
+                    "priceUnit": 1000
+                  }
+                ]
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Factura generada exitosamente",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "D6A0D688",
+                    "cuf": "1D2C888524*****************1B887CDFDC74",
+                    "invoiceNumber": 1,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A53036C3A38518F1E3AA21C963E8606A883D1B887CDFDC74&numero=1&t=1",
+                    "invoiceUrl": "/pdf?code=DC3E4E6TUWxbaS36JJ0w3iOcmlfb&client=10T9ATSWLFY5GOFRETODKH6BF",
+                    "dateEmission": "2021-12-13T20:46:54.305",
+                    "amountTotal": 2580.0,
+                    "amountTotalDiscount": 10.0,
+                    "amountTotalCurrency": 2580.0,
+                    "userCashier": "S4INC12ABCX",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "2b10887***********a**e133**f60",
+                    "siatDescriptionStatus": "accepted",
+                    "countItems": 2,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
+            "description": "Error en los datos de entrada",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +118,438 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/invoice/electronic/sale/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de venta",
+        "description": "Endpoint para la anulación de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/computarized/sale/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de venta",
+        "description": "Endpoint para la anulación de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/saleBon": {
+      "post": {
+        "summary": "Genera una factura electrónica de venta",
+        "description": "Endpoint para la emisión de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequest"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "CLIENTE TEST",
+                "clientDocumentType": 1,
+                "clientNroDocument": 123456789,
+                "clientCode": "CLIENTE2-TEST",
+                "paramPaymentMethod": 1,
+                "userPos": "S4INC12ABCX",
+                "typeInvoice": 1,
+                "paramCurrency": 1,
+                "clientComplement": 1,
+                "clientCity": "Santa Cruz",
+                "clientEmail": "cliente@gmail.com",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 11,
+                    "codeProductSin": 83141,
+                    "codeProduct": "CC-SRVSISCLOUD123",
+                    "description": "IMPLEMENTACIÓN DE SISTEMAS EN LA NUBE",
+                    "qty": 2,
+                    "priceUnit": 1000
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "D6A0D688",
+                    "cuf": "1D2C888524*****************1B887CDFDC74",
+                    "invoiceNumber": 1,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A53036C3A38518F1E3AA21C963E8606A883D1B887CDFDC74&numero=1&t=1",
+                    "invoiceUrl": "/pdf?code=DC3E4E6TUWxbaS36JJ0w3iOcmlfb&client=10T9ATSWLFY5GOFRETODKH6BF",
+                    "dateEmission": "2021-12-13T20:46:54.305",
+                    "amountTotal": 2580.0,
+                    "amountTotalDiscount": 10.0,
+                    "amountTotalCurrency": 2580.0,
+                    "userCashier": "S4INC12ABCX",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "2b10887***********a**e133**f60",
+                    "siatDescriptionStatus": "accepted",
+                    "countItems": 2,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/saleBon/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de venta",
+        "description": "Endpoint para la anulación de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invoice/electronic/rate": {
+      "post": {
+        "summary": "Genera una factura electrónica de venta",
+        "description": "Endpoint para la emisión de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestRate"
+              },
+              "example": {
+                "posId": 1,
+                "clientReasonSocial": "VIDAURRE",
+                "clientDocumentType": 5,
+                "clientNroDocument": "1410245015",
+                "exceptionCode": 1,
+                "clientCode": "ADMINCLIENT",
+                "clientComplement": null,
+                "clientEmail": "normmy@gmail.com",
+                "clientPhone": "123123123",
+                "paramPaymentMethod": 27,
+                "userPos": "USRTESTB341",
+                "paramCurrency": "1",
+                "clientCity": "SANTA CRUZ",
+                "exchangeRate": 8.31,
+                "amountUsd": 178.16,
+                "additionalDiscount": 1,
+                "giftCard": 2,
+                "observations": "observations",
+                "detailInvoice": [
+                  {
+                    "activityEconomic": "620100",
+                    "unitMeasure": 62,
+                    "codeProductSin": 83141,
+                    "codeProduct": "PAGOS-F12907",
+                    "description": "PAGO DE MATRICULA",
+                    "qty": 44,
+                    "priceUnit": 8.3
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura generada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponse"
+                },
+                "example": {
+                  "message": "COMPLETED_RATE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "nitEmissor": 6822046012,
+                    "invoiceCode": "FDA62098",
+                    "cuf": "1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74",
+                    "invoiceNumber": 14,
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A6996BEB5B78C68E8B3B1E9695FA95CC29F45412D8849E74&numero=14&t=2",
+                    "invoiceUrl": "/pdf?code=FDA62098zE5zDVSS4AVTk1RlQjuq&client=V0K9O3URC2849MOQ7Z4PI48B3",
+                    "dateEmission": "2024-12-21T16:11:41.805",
+                    "amountTotal": 0.0,
+                    "amountTotalDiscount": 1.0,
+                    "amountTotalCurrency": 364.2,
+                    "userCashier": "USRTESTB341",
+                    "siatCodeState": 908,
+                    "siatCodeReception": "cb43167f-bfd7-11ef-9792-874b9ca9eb03",
+                    "siatDescriptionStatus": "VALIDADA",
+                    "countItems": 1,
+                    "invoiceXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<facturaComputarizadaCompraVenta>\n    <cabecera>\n        <nitEmisor>6822046012</nitEmisor>\n        <razonSocialEmisor></facturaComputarizadaCompraVenta>\n",
+                    "detailInvoice": [
+                      {
+                        "detailId": 3,
+                        "activityEconomic": "620100",
+                        "codeProductSin": "83141",
+                        "codeProduct": "CC-SRVSISCLOUD123",
+                        "description": "IMPLEMETACION DE SISTEMAS EN LA NUBE",
+                        "qty": 2.0025,
+                        "unitMeasure": 11,
+                        "priceUnit": 1000.0,
+                        "amountDiscount": 0.0,
+                        "subTotal": 2000.0,
+                        "numberSerial": null,
+                        "numberImei": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/invoice/electronic/rate/anulation": {
+      "post": {
+        "summary": "Anula una factura electrónica de venta",
+        "description": "Endpoint para la anulación de facturas electrónicas con validación en tiempo real ante el SIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequestAnulate"
+              },
+              "example": {
+                "invoiceCode": "D80C9B77",
+                "posId": 1,
+                "branchId": 1,
+                "codeMotive": 1,
+                "invoiceNumber": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factura anulada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseAnulate"
+                },
+                "example": {
+                  "message": "COMPLETED_SALE",
+                  "errors": null,
+                  "success": true,
+                  "data": {
+                    "invoiceNumber": 5,
+                    "cuf": "1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74",
+                    "siatCodeState": 905,
+                    "siatDescriptionStatus": "ANULACION CONFIRMADA",
+                    "qrCode": "https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=6822046012&cuf=1D2C888524A59DA163372084D5C6D0EF29B39A4212405AA79B33246D74&numero=5&t=2",
+                    "invoiceCode": "D80C9B77"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en los datos de entrada",
             "content": {
               "application/json": {
                 "schema": {
@@ -130,76 +562,292 @@
       }
     }
   },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
-          }
-        }
-      }
-    }
-  },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "InvoiceRequest": {
         "type": "object",
+        "required": [
+          "posId",
+          "branchId",
+          "clientReasonSocial",
+          "clientDocumentType",
+          "clientNroDocument",
+          "clientCode",
+          "paramPaymentMethod",
+          "userPos",
+          "typeInvoice",
+          "paramCurrency",
+          "clientCity",
+          "clientEmail"
+        ],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "branchId": {
+            "type": "integer",
+            "description": "Id sucursal"
+          },
+          "clientReasonSocial": {
+            "type": "string",
+            "description": "Razón Social del cliente"
+          },
+          "clientDocumentType": {
+            "type": "string",
+            "description": "Autogenerado desde catálogos por el agrupador 9. (Valor que identifica el Tipo de Documento utilizado para la emisión de la factura)"
+          },
+          "clientNroDocument": {
+            "type": "String",
+            "description": "Número que corresponde al Tipo de Documento Identidad utilizado y al cual se realizará la facturación."
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "Código de identificación único del cliente, deberá ser asignado por el sistema de facturación del contribuyente."
+          },
+          "paramPaymentMethod": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 13. (Valor que identifica el método de pago. Por ejemplo 1 es efectivo)."
+          },
+          "userPos": {
+            "type": "string",
+            "description": "Identifica al usuario que emite la factura, deberá ser descriptivo. Por ejemplo JPEREZ."
+          },
+          "typeInvoice": {
+            "type": "integer",
+            "description": "Tipo de la factura, valores permitidos: 1 = Factura con Derecho a Crédito Fiscal 2 = Factura sin Derecho a Crédito Fiscal 3 = Documento de Ajuste"
+          },
+          "paramCurrency": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 14. (Valor que identifica la moneda)."
+          },
+          "clientComplement": {
+            "type": "string",
+            "description": "Complemento de cliente."
+          },
+          "clientCity": {
+            "type": "string",
+            "description": "Ciudad del cliente."
+          },
+          "exceptionCode": {
+            "type": "integer",
+            "description": "Valor que se envía para autorizar el registro de una factura con NIT inválido. Enviar uno (1) cuando se autorice el registro."
+          },
+          "numberCard": {
+            "type": "string",
+            "description": "Cuando el método de pago es 2 (Tarjeta), debe enviarse este valor."
+          },
+          "giftCard": {
+            "type": "integer",
+            "description": "Monto a ser cancelado con una Gift Card."
+          },
+          "clientEmail": {
+            "type": "string",
+            "description": "Email del cliente."
+          },
+          "additionalDiscount": {
+            "type": "integer",
+            "description": "Monto Adicional al descuento por item"
+          },
+          "detailInvoice": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceDetail"
+            }
           }
         }
       },
-      "NewPlant": {
+    
+      "InvoiceRequestRate": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/Plant"
+            "$ref": "#/components/schemas/InvoiceRequest"
           },
           {
-            "required": [
-              "id"
-            ],
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "exchangeRate": {
+                "type": "number",
+                "description": "Tipo de cambio de la moneda"
+              },
+              "amountUsd": {
+                "type": "number",
+                "description": "Monto en dólares"
+              },
+              "observations": {
+                "type": "string",
+                "description": "Observaciones adicionales"
               }
-            }
+            },
+            "required": [
+              "exchangeRate"
+            ]
           }
         ]
       },
-      "Error": {
+      "InvoiceDetail": {
+        "type": "object",
         "required": [
-          "error",
-          "message"
+          "activityEconomic",
+          "unitMeasure",
+          "codeProductSin",
+          "codeProduct",
+          "description",
+          "qty",
+          "priceUnit"
         ],
+        "properties": {
+          "activityEconomic": {
+            "type": "string",
+            "description": "Código de actividad económica"
+          },
+          "unitMeasure": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 17. (Valor que identifica la unidad de medida)."
+          },
+          "codeProductSin": {
+            "type": "string",
+            "description": "Homologado a los códigos de productos genéricos enviados por impuestos (ver agrupador 1 de catálogos)."
+          },
+          "codeProduct": {
+            "type": "string",
+            "description": "Código interno del producto"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción que otorga el contribuyente a su servicio o producto."
+          },
+          "qty": {
+            "type": "integer",
+            "description": "Cantidad del producto o servicio otorgado. En caso de servicio este valor debe ser 1."
+          },
+          "priceUnit": {
+            "type": "number",
+            "format": "double",
+            "description": "Precio que otorga el contribuyente a su servicio o producto.(puede contener decimales ejem. 9.99)"
+          },
+          "amountDiscount": {
+            "type": "number",
+            "format": "double",
+            "description": "Monto de descuento sobre el producto o servicio específico, Si no aplica deberá ser nulo."
+          },
+          "numberSerial": {
+            "type": "integer",
+            "description": "Número de serie correspondiente al producto vendido de línea blanca o negra. Nulo en otro caso."
+          },
+          "numberImei": {
+            "type": "integer",
+            "description": "Número de Imei del celular vendido, nulo en otro caso."
+          }
+        }
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "amountTotal": {
+            "type": "integer",
+            "description": "Monto total por el cual se realiza el hecho generador."
+          },
+          "amountTotalDiscount": {
+            "type": "integer",
+            "description": "Monto Adicional al descuento por item."
+          },
+          "siatCodeState": {
+            "type": "integer",
+            "description": "Código de estado."
+          },
+          "siatCodeReception": {
+            "type": "string",
+            "description": "Código de recepción."
+          },
+          "siatDescriptionStatus": {
+            "type": "string",
+            "description": "Descripción del estado"
+          },
+          "invoiceXml": {
+            "type": "string",
+            "description": "XML de la factura firmada"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código corto de la factura (invoiceCode)."
+          },
+          "qrCode": {
+            "type": "string",
+            "description": "URL del código QR para validación"
+          },
+          "invoiceUrl": {
+            "type": "string",
+            "description": "Ruta publica de la factura."
+          }
+        }
+      },
+      "InvoiceResponseAnulate": {
+        "type": "object",
+        "properties": {
+          "invoiceNumber": {
+            "type": "integer",
+            "description": "Número de factura emitida."
+          },
+          "cuf": {
+            "type": "string",
+            "description": "Código único de factura."
+          },
+          "siatCodeState": {
+            "type": "integer",
+            "description": "Código de estado enviado por el SIN."
+          },
+          "siatDescriptionStatus": {
+            "type": "string",
+            "description": "Descripción del estado"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código corto de la factura (invoiceCode)."
+          },
+          "qrCode": {
+            "type": "string",
+            "description": "URL del código QR para validación"
+          }
+        }
+      },
+      "InvoiceRequestAnulate": {
+        "type": "object",
+        "required": [
+          "posId",
+          "branchId",
+          "invoiceCode",
+          "codeMotive",
+          "invoiceNumber"
+        ],
+        "properties": {
+          "posId": {
+            "type": "integer",
+            "description": "ID del punto de venta"
+          },
+          "branchId": {
+            "type": "integer",
+            "description": "Id sucursal"
+          },
+          "invoiceCode": {
+            "type": "string",
+            "description": "Código de factura que está siendo anulado."
+          },
+          "codeMotive": {
+            "type": "integer",
+            "description": "Autogenerado desde catálogos por el agrupador 7. (Indica el motivo por el cual la Factura está siendo anulada)."
+          },
+          "invoiceNumber": {
+            "type": "integer",
+            "description": "Número de factura que está siendo anulado."
+          }
+        }
+      },
+      "Error": {
         "type": "object",
         "properties": {
           "error": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "message": {
             "type": "string"
