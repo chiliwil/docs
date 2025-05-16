@@ -44,6 +44,13 @@
             ]
           },
           {
+            "group": "Requisitos",
+            "pages": [
+              "api-reference/requisitos",
+              "api-reference/solicitud"
+            ]
+          },
+          {
             "group": "Endpoint Configuration",
             "pages": [
               "api-reference/endpoint/login-auth",
@@ -164,8 +171,14 @@
                   "api-reference/endpoint/other-services/service-event-end"
                 ]
               },
-              "api-reference/endpoint/other-services/service-email",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoint/other-services/service-email"
+             
+            ]
+          },
+          {
+            "group": "Archivos Pdf",
+            "pages": [
+               "api-reference/pdf"
             ]
           }
         ]
