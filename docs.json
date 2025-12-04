@@ -11,30 +11,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Get Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Essentials",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "API Reference",
         "groups": [
           {
@@ -179,27 +155,34 @@
             "pages": [
               "api-reference/pdf"
             ]
+          },
+          {
+            "group": "Políticas",
+            "pages": [
+              "api-reference/politica-privacidad"
+            ]
           }
+
         ]
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "API youtube",
+          "href": "https://www.youtube.com/channel/UCeSrc9FUnBMCPHfp-dmzMKw",
+          "icon": "play"
         },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
+         {
+        "anchor": "Email Support",
+        "href": "mailto:api@cucu.bo",
+        "icon": "book-open-cover"
+      },
+      {
+        "anchor": "Slack",
+        "href": "https://app.slack.com/client/T034CF04H17",
+        "icon": "slack"
+      }
       ]
     }
   },
@@ -208,12 +191,7 @@
     "dark": "/logo/dark.png"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
+    
     "primary": {
       "type": "button",
       "label": "Dashboard",
@@ -222,9 +200,9 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "twitter": "https://www.tiktok.com/@cucuapi",
+      "facebook": "https://www.facebook.com/cucuapi/",
+      "youtube": "https://www.youtube.com/channel/UCeSrc9FUnBMCPHfp-dmzMKw"
     }
   }
 }
